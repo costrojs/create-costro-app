@@ -9,6 +9,9 @@ module.exports = {
 	parserOptions: {
 		ecmaFeatures: {
 			jsx: true
+		},
+		babelOptions: {
+			configFile: './config/babel.config.js'
 		}
 	},
 	rules: {

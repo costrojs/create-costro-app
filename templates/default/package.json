@@ -3,10 +3,10 @@
 	"version": "1.0.0",
 	"private": true,
 	"scripts": {
-		"build": "webpack --mode=production",
-		"dev": "webpack serve --mode=development",
-		"lint": "eslint . --ignore-pattern build",
-		"test": "jest"
+		"build": "webpack --config ./config/webpack.config.js --mode=production",
+		"dev": "webpack serve --config ./config/webpack.config.js --mode=development",
+		"lint": "eslint . -c ./config/.eslintrc.js --ignore-pattern build",
+		"test": "jest --config ./config/jest.config.js"
 	},
 	"dependencies": {
 		"costro": "^1.0.0-rc.1"
