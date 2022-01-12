@@ -1,0 +1,42 @@
+{
+	"name": "create-costro-app",
+	"version": "1.0.0",
+	"private": true,
+	"scripts": {
+		"build": "webpack --mode=production",
+		"dev": "webpack serve --mode=development",
+		"lint": "eslint . --ignore-pattern dist",
+		"test": "jest"
+	},
+	"dependencies": {
+		"costro": "^1.0.0-rc.1"
+	},
+	"devDependencies": {
+		"@babel/core": "^7.16.0",
+		"@babel/eslint-parser": "^7.16.3",
+		"@babel/plugin-proposal-class-properties": "^7.16.0",
+		"@babel/plugin-transform-react-jsx": "^7.16.0",
+		"@babel/preset-env": "^7.16.0",
+		"babel-loader": "^8.2.2",
+		"css-loader": "^6.5.1",
+		"eslint": "^7.32.0",
+		"eslint-plugin-react": "^7.27.0",
+		"html-webpack-plugin": "^5.5.0",
+		"jest": "^27.4.7",
+		"mini-css-extract-plugin": "^2.4.6",
+		"postcss": "^8.3.11",
+		"postcss-custom-media": "^8.0.0",
+		"postcss-import": "^14.0.2",
+		"postcss-loader": "^6.2.0",
+		"postcss-nested": "^5.0.6",
+		"postcss-preset-env": "^6.7.0",
+		"postcss-url": "^10.1.3",
+		"terser-webpack-plugin": "^5.2.5",
+		"webpack": "^5.64.0",
+		"webpack-cli": "^4.9.1",
+		"webpack-dev-server": "^4.7.3"
+	},
+	"engines": {
+		"node": ">= 12"
+	}
+}
