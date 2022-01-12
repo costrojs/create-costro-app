@@ -1,4 +1,9 @@
 module.exports = {
+	env: {
+		browser: true,
+		node: true,
+		jest: true
+	},
 	extends: ['eslint:recommended', 'plugin:react/recommended'],
 	parser: '@babel/eslint-parser',
 	parserOptions: {
@@ -17,9 +22,5 @@ module.exports = {
 			pragma: 'h', // createElement
 			version: '0' // Remove the warning of the missing React package
 		}
-	},
-	env: {
-		browser: true,
-		node: true
 	}
 };
