@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  push:
+    branches:
+    pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    working-directory: templates/default
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Cache node_modules
+        uses: actions/cache@v1
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.npm # npm cache files are stored in `~/.npm` on Linux/macOS
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - name: Read .nvmrc
+        run: echo NVMRC=`cat .nvmrc` >> $GITHUB_ENV
+
+      - uses: actions/setup-node@v1
+        with:
+          node-version: ${{ env.NVMRC }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      # - name: Test
+        # run: npm run test
+
+      - name: Build
+        run: npm run build
+
+      - name: Upload coverage artifacts
+        uses: actions/upload-artifact@v2
+        if: github.ref == 'refs/heads/main' &&
+            github.repository == 'costrojs/create-costro-app' &&
+            github.event_name != 'pull_request'
+        with:
+          name: coverage
+          path: coverage
+
+      - name: Test Fixtures
+        run: npm run test:fixtures
+
+  deploy-coverage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: build
+    if: success() &&
+        github.ref == 'refs/heads/main' &&
+        github.repository == 'costrojs/create-costro-app' &&
+        github.event_name != 'pull_request'
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Download coverage artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: coverage
+          # The path is mandatory with actions/download-artifact@v2
+          # https://github.com/actions/download-artifact#compatibility-between-v1-and-v2
+          path: coverage
+
+      - name: Coveralls
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: 'coverage/lcov.info'
