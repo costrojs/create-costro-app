@@ -5,11 +5,15 @@ on:
     branches:
     pull_request:
 
+defaults:
+  run:
+    shell: bash
+    working-directory: templates/default
+
 jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 60
-    working-directory: templates/default
     steps:
       - uses: actions/checkout@v2
 
