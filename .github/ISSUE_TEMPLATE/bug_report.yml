@@ -1,0 +1,53 @@
+name: Bug report
+description: Create a report to help us improve Create Costro App
+labels: 'bug'
+body:
+  - type: textarea
+    validations:
+      required: true
+    attributes:
+      label: Describe the bug
+      description: A clear description of what the bug is.
+  - type: textarea
+    validations:
+      required: true
+    attributes:
+      label: Steps to reproduce
+      description: |
+        Steps to reproduce the problem.
+  - type: textarea
+    validations:
+      required: true
+    attributes:
+      label: Expected behavior
+      description: A brief description of what should happen.
+  - type: textarea
+    attributes:
+      label: Screenshots and recordings
+      description: If applicable, add screenshots to help explain your problem.
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Please include the browser console (copy and paste log text) at the time this bug occurred.
+      render: shell
+  - type: textarea
+    id: system-info
+    attributes:
+      label: System Info
+      description: Output of `npx envinfo --system --npmPackages costro,rollup,webpack --binaries --browsers`
+      render: shell
+      placeholder: System, binaries, browsers
+    validations:
+      required: true
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      description: Select the severity of this issue.
+      options:
+        - Annoyance
+        - Blocking an upgrade
+        - Blocking all usage of Create Costro App
+    validations:
+      required: true
