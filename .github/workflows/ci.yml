@@ -74,7 +74,7 @@ jobs:
           name: coverage
           # The path is mandatory with actions/download-artifact@v2
           # https://github.com/actions/download-artifact#compatibility-between-v1-and-v2
-          path: templates/default/coverage
+          path: coverage
 
       - name: Coveralls
         uses: coverallsapp/github-action@master
