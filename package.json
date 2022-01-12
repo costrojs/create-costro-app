@@ -1,0 +1,10 @@
+{
+  "name": "costro-cli",
+  "version": "1.0.0",
+  "description": "",
+  "bin": {
+    "create-costro-app": "cli.js"
+  },
+  "author": "",
+  "license": "ISC"
+}
