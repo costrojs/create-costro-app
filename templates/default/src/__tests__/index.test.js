@@ -1,5 +1,5 @@
 import Navigation from '../components/navigation';
-import { h } from 'costro/dist/jsx';
+import { h } from 'costro/jsx';
 
 describe('Navigation constructor', () => {
 	it('Should call the navigation function', () => {

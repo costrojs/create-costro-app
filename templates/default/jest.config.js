@@ -5,5 +5,6 @@ module.exports = {
 	resetModules: true,
 	verbose: true,
 	coverageDirectory: 'coverage',
-	testEnvironment: 'jsdom'
+	testEnvironment: 'jsdom',
+	resolver: './jest-resolver.js'
 };
