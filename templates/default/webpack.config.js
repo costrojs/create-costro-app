@@ -80,7 +80,7 @@ module.exports = (env, argv) => {
 			clean: true
 		},
 		plugins: [
-			new webpack.ProgressPlugin(),
+			new webpack.ProgressPlugin(), // TODO: remove on mode production
 			new MiniCssExtractPlugin({
 				chunkFilename: `static/[name]${suffixHash}.css`,
 				filename: `static/[name]${suffixHash}.css`
