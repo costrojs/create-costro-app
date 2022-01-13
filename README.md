@@ -1,7 +1,5 @@
 # Create Costro App
 
-![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/costrojs/create-costro-app/CI/main?style=for-the-badge)
-
 ## Getting started
 
 ⚠️ The project is under development.

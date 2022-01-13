@@ -2,19 +2,20 @@
 
 ('use strict');
 
-const fs = require('fs');
-const chalk = require('chalk');
-const { Command } = require('commander');
+const path = require('path');
+const fs = require('fs-extra');
+const { bold, red, green, cyan, gray } = require('chalk');
 const prompts = require('prompts');
-const spawn = require('cross-spawn');
-const ora = require('ora');
+const Listr = require('listr');
+const execa = require('execa');
 
 const currentNodeVersion = process.versions.node;
 const majorVersion = currentNodeVersion.split('.')[0];
 
+// Check the minimum version of Node.js
 if (majorVersion < 12) {
 	console.error(
-		chalk.red(
+		red(
 			'You are running Node ' +
 				currentNodeVersion +
 				'.\n' +
@@ -25,16 +26,10 @@ if (majorVersion < 12) {
 	process.exit(1);
 }
 
-// const program = new Command();
-
 const {
 	name: packageName,
 	version: packageVersion
 } = require('./package.json');
-console.log(
-	`\n${chalk.green.bold(`Welcome to Create Costro CLI v${packageVersion}`)}\n`
-);
-
 const cwd = process.argv[2] || '.';
 
 function isUsingYarn() {
@@ -42,27 +37,35 @@ function isUsingYarn() {
 }
 
 (async () => {
-	// if (fs.existsSync(cwd)) {
-	// 	if (fs.readdirSync(cwd).length > 0) {
-	// 		const response = await prompts({
-	// 			type: 'confirm',
-	// 			name: 'value',
-	// 			message: 'Directory not empty. Continue?',
-	// 			initial: false
-	// 		});
+	console.log(
+		`\n${green.bold(`Welcome to the Create Costro CLI`)} ${gray(
+			`(v${packageVersion})`
+		)}\n`
+	);
 
-	// 		if (!response.value) {
-	// 			process.exit(1);
-	// 		}
-	// 	}
-	// } else {
-	// 	fs.mkdirSync(cwd, { recursive: true });
-	// }
+	// Check the target directory
+	if (fs.existsSync(cwd)) {
+		if (fs.readdirSync(cwd).length > 0) {
+			const response = await prompts({
+				type: 'confirm',
+				name: 'value',
+				message: 'Directory not empty. Continue?',
+				initial: false
+			});
+
+			if (!response.value) {
+				process.exit(1);
+			}
+		}
+	} else {
+		fs.mkdirSync(cwd, { recursive: true });
+	}
 
 	let command;
 	let args;
 
 	if (isUsingYarn()) {
+		// TODO: Add yarn support
 	} else {
 		command = 'npm';
 		args = [
@@ -72,56 +75,118 @@ function isUsingYarn() {
 			'--save-exact',
 			'--loglevel',
 			'error'
-		].concat([]);
-		// args.push('--verbose');
+		];
 	}
 
-	// (Costro, webpack, Babel, ESLint, Prettier, Jest)
+	// Choose the template
 	const options = await prompts([
 		{
 			type: 'select',
 			name: 'template',
-			message: 'Which template?',
+			message: 'Which Costro app template?',
 			choices: [
 				{
 					title: 'JavaScript',
+					description:
+						'Packages included: webpack, Babel, ESLint, Prettier, Jest',
 					value: 'default'
 				},
 				{
 					title: 'TypeScript',
+					disabled: true,
+					description:
+						'Packages included: TypeScript, webpack, Babel, ESLint, Prettier, Jest',
 					value: 'typescript'
 				}
 			]
 		}
 	]);
 
-	// console.log(options.template);
-
-	let spinner = ora({
-		text: 'Creating project\n',
-		color: 'blue'
-	}).start();
-
-	try {
-		const repos = await fetch(
-			`https://github.com/costrojs/costro-templates`
-		).then((r) => r.json());
-		console.log(repos);
-		// await writeFile(cacheFilePath, JSON.stringify(repos, null, 2), 'utf-8');
-	} catch (err) {
-		error(`\nFailed to update template cache\n ${err}`);
+	// Create cache directory
+	const CACHE_DIR = '.cache';
+	if (!fs.existsSync(`${cwd}/${CACHE_DIR}`)) {
+		fs.mkdirSync(`${cwd}/${CACHE_DIR}`);
+	} else {
+		fs.remove(`${cwd}/${CACHE_DIR}`);
 	}
 
-	// const text = `Installing ${chalk.cyan('costro')}, ${chalk.cyan(
-	// 	'webpack'
-	// )}, ${chalk.cyan('Babel')}, ${chalk.cyan('ESLint')}, ${chalk.cyan(
-	// 	'Prettier'
-	// )} and ${chalk.cyan('Jest')} ${` with ${chalk.cyan(packageName)}`}`;
-	// spinner.text = text;
+	// Declare async tasks
+	const tasks = new Listr([
+		{
+			title: `Fetch template ${options.template}`,
+			task: async () => {
+				const child = await execa('git', [
+					'clone',
+					'https://github.com/costrojs/costro-templates.git',
+					`${cwd}/${CACHE_DIR}/costro-templates`
+				]);
+			}
+		},
+		{
+			title: 'Create project',
+			task: async () => {
+				return new Promise((resolve, reject) => {
+					const templatePath = `${cwd}/${CACHE_DIR}/costro-templates/templates/${options.template}`;
+					if (fs.existsSync(templatePath)) {
+						fs.copy(templatePath, cwd, function (err) {
+							if (err) {
+								console.log(
+									'An error occured while copying the folder.'
+								);
+								return console.error(err);
+							}
 
-	spinner.text = 'Installing dependencies:\n';
-	spinner.stopAndPersist();
-	// const child = spawn(command, args, { stdio: 'inherit' });
+							fs.remove(`${cwd}/${CACHE_DIR}`);
 
-	spinner.succeed('Done!\n');
+							resolve();
+						});
+					} else {
+						reject(
+							new Error(
+								red(
+									`Error - The template path "${templatePath}" is unknown. \n`
+								)
+							)
+						);
+					}
+				});
+			}
+		},
+		{
+			title: 'Installing dependencies',
+			task: async () => {
+				const child = await execa(
+					'npm',
+					[
+						'install',
+						'--no-audit', // https://github.com/facebook/create-react-app/issues/11174
+						'--save',
+						'--save-exact',
+						'--loglevel',
+						'error'
+					],
+					{
+						cwd
+					}
+				);
+			}
+		}
+	]);
+
+	// Run async tasks
+	await tasks.run();
+
+	// Display project informations
+	console.log(bold(green('\nYour project is ready!\n')));
+	console.log('Available npm scripts:');
+	console.log(`- ${bold.cyan('npm run dev')}`);
+	console.log(`- ${bold.cyan('npm run build')}`);
+	console.log(`- ${bold.cyan('npm run lint')}`);
+	console.log(`- ${bold.cyan('npm run jest')}`);
+	console.log(`\nTo close the dev server, hit ${bold(cyan('Ctrl-C'))}`);
+	console.log(
+		`Problems? Open an issue on ${cyan(
+			'https://github.com/costrojs/create-costro/issues'
+		)} if none exists already.`
+	);
 })();
