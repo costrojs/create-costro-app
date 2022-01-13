@@ -1,10 +1,18 @@
 {
-  "name": "costro-cli",
-  "version": "1.0.0",
-  "description": "",
-  "bin": {
-    "create-costro-app": "cli.js"
-  },
-  "author": "",
-  "license": "ISC"
+	"name": "create-costro-app",
+	"version": "1.0.0",
+	"bin": {
+		"create-costro-app": "index.js"
+	},
+	"scripts": {
+		"inspect": "node --inspect cli.js"
+	},
+	"dependencies": {},
+	"devDependencies": {
+		"chalk": "^4.1.2",
+		"commander": "^8.3.0",
+		"cross-spawn": "^7.0.3",
+		"ora": "^5.4.1",
+		"prompts": "^2.4.2"
+	}
 }
