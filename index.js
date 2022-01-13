@@ -32,7 +32,7 @@ const {
 } = require('./package.json');
 const cwd = process.argv[2] || '.';
 
-function isUsingYarn() {
+function isYarn() {
 	return (process.env.npm_config_user_agent || '').indexOf('yarn') === 0;
 }
 
@@ -59,23 +59,6 @@ function isUsingYarn() {
 		}
 	} else {
 		fs.mkdirSync(cwd, { recursive: true });
-	}
-
-	let command;
-	let args;
-
-	if (isUsingYarn()) {
-		// TODO: Add yarn support
-	} else {
-		command = 'npm';
-		args = [
-			'install',
-			'--no-audit', // https://github.com/facebook/create-react-app/issues/11174
-			'--save',
-			'--save-exact',
-			'--loglevel',
-			'error'
-		];
 	}
 
 	// Choose the template
@@ -154,6 +137,7 @@ function isUsingYarn() {
 		},
 		{
 			title: 'Installing dependencies',
+			enabled: () => !isYarn(),
 			task: async () => {
 				const child = await execa(
 					'npm',
