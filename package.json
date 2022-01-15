@@ -1,9 +1,22 @@
 {
 	"name": "create-costro-app",
 	"version": "1.0.0",
+	"homepage": "https://costro.js.org",
+	"bugs": {
+		"url": "https://github.com/costrojs/create-costro-app/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/costrojs/create-costro-app.git"
+	},
+	"license": "MIT",
+	"author": "Joris DANIEL",
 	"bin": {
 		"create-costro-app": "bin/cli.js"
 	},
+	"files": [
+		"bin"
+	],
 	"scripts": {
 		"inspect": "node --inspect bin/cli.js"
 	},
@@ -14,5 +27,8 @@
 		"fs-extra": "^10.0.0",
 		"listr": "^0.14.3",
 		"prompts": "^2.4.2"
+	},
+	"engines": {
+		"node": ">= 12"
 	}
 }
