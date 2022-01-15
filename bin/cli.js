@@ -69,7 +69,7 @@ function isYarn() {
 			message: 'Which Costro app template?',
 			choices: [
 				{
-					title: 'JavaScript',
+					title: 'Default',
 					description:
 						'Packages included: webpack, Babel, ESLint, Prettier, Jest',
 					value: 'default'
