@@ -29,7 +29,7 @@ if (majorVersion < 12) {
 const {
 	name: packageName,
 	version: packageVersion
-} = require('./package.json');
+} = require('../package.json');
 const cwd = process.argv[2] || '.';
 
 function isYarn() {

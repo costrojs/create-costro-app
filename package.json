@@ -2,10 +2,10 @@
 	"name": "create-costro-app",
 	"version": "1.0.0",
 	"bin": {
-		"create-costro-app": "index.js"
+		"create-costro-app": "bin/cli.js"
 	},
 	"scripts": {
-		"inspect": "node --inspect cli.js"
+		"inspect": "node --inspect bin/cli.js"
 	},
 	"dependencies": {},
 	"devDependencies": {
