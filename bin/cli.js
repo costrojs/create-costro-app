@@ -16,11 +16,7 @@ const majorVersion = currentNodeVersion.split('.')[0];
 if (majorVersion < 12) {
 	console.error(
 		red(
-			'You are running Node ' +
-				currentNodeVersion +
-				'.\n' +
-				'Create Costro App requires Node 12 or higher. \n' +
-				'Please update your version of Node.'
+			`You are running Node ${currentNodeVersion}.\nCreate Costro App requires Node 12 or higher.\nPlease update your version of Node.`
 		)
 	);
 	process.exit(1);
@@ -48,42 +44,21 @@ function isYarn() {
 		if (fs.readdirSync(cwd).length > 0) {
 			const response = await prompts({
 				type: 'confirm',
-				name: 'value',
+				name: 'confirmDirectory',
 				message: 'Directory not empty. Continue?',
 				initial: false
 			});
 
-			if (!response.value) {
+			// Exit if no answer (ctrl + c)
+			if (!response.confirmDirectory) {
 				process.exit(1);
 			}
+
+			console.log();
 		}
 	} else {
 		fs.mkdirSync(cwd, { recursive: true });
 	}
-
-	// Choose the template
-	const options = await prompts([
-		{
-			type: 'select',
-			name: 'template',
-			message: 'Which Costro app template?',
-			choices: [
-				{
-					title: 'Default',
-					description:
-						'Packages included: webpack, Babel, ESLint, Prettier, Jest',
-					value: 'default'
-				},
-				{
-					title: 'TypeScript',
-					disabled: true,
-					description:
-						'Packages included: TypeScript, webpack, Babel, ESLint, Prettier, Jest',
-					value: 'typescript'
-				}
-			]
-		}
-	]);
 
 	// Create cache directory
 	const CACHE_DIR = '.cache';
@@ -94,44 +69,76 @@ function isYarn() {
 	}
 
 	// Declare async tasks
-	const tasks = new Listr([
+	const tasks1 = new Listr([
 		{
-			title: `Fetch template ${options.template}`,
+			title: `Fetch templates`,
 			task: async () => {
-				const child = await execa('git', [
-					'clone',
-					'https://github.com/costrojs/costro-templates.git',
-					`${cwd}/${CACHE_DIR}/costro-templates`
+				await execa('npm', [
+					'install',
+					'git+https://github.com/costrojs/costro-templates.git',
+					'--prefix',
+					`${cwd}/${CACHE_DIR}`,
+					'--no-audit' // https://github.com/facebook/create-react-app/issues/11174
 				]);
 			}
-		},
+		}
+	]);
+
+	// Run async tasks
+	await tasks1.run();
+
+	console.log();
+
+	// Build the list of templates from GitHub repository
+	const templatesPath = `${cwd}/${CACHE_DIR}/node_modules/costro-templates/templates`;
+	const templates = fs.readdirSync(templatesPath).map((name) => ({
+		title: name[0].toUpperCase() + name.slice(1),
+		value: name
+	}));
+
+	// Prompt template choice to the user
+	const options = await prompts([
+		{
+			type: 'select',
+			name: 'template',
+			message: 'Which Costro app template?',
+			choices: templates
+		}
+	]);
+
+	// Exit if no answer (ctrl + c)
+	if (!options.template) {
+		process.exit(1);
+	}
+
+	console.log();
+
+	const templatePath = `${templatesPath}/${options.template}`;
+	const tasks2 = new Listr([
 		{
 			title: 'Create project',
 			task: async () => {
 				return new Promise((resolve, reject) => {
-					const templatePath = `${cwd}/${CACHE_DIR}/costro-templates/templates/${options.template}`;
-					if (fs.existsSync(templatePath)) {
-						fs.copy(templatePath, cwd, function (err) {
-							if (err) {
-								console.log(
-									'An error occured while copying the folder.'
-								);
-								return console.error(err);
-							}
-
-							fs.remove(`${cwd}/${CACHE_DIR}`);
-
-							resolve();
-						});
-					} else {
-						reject(
-							new Error(
-								red(
-									`Error - The template path "${templatePath}" is unknown. \n`
-								)
-							)
+					fs.copy(templatePath, cwd, function (err) {
+						if (err) {
+							console.log(
+								'An error occured while copying the folder.'
+							);
+							return console.error(err);
+						}
+						// Update package.json (default version and template version)
+						const packageJson = fs.readJsonSync(
+							`${templatePath}/package.json`
 						);
-					}
+						packageJson['version'] = '1.0.0';
+						packageJson['costro-templates'] = packageJson.version;
+						fs.writeJsonSync(`${cwd}/package.json`, packageJson, {
+							spaces: '\t'
+						});
+						// Remove the cache
+						fs.remove(`${cwd}/${CACHE_DIR}`);
+						resolve();
+					});
 				});
 			}
 		},
@@ -145,9 +152,7 @@ function isYarn() {
 						'install',
 						'--no-audit', // https://github.com/facebook/create-react-app/issues/11174
 						'--save',
-						'--save-exact',
-						'--loglevel',
-						'error'
+						'--save-exact'
 					],
 					{
 						cwd
@@ -158,7 +163,7 @@ function isYarn() {
 	]);
 
 	// Run async tasks
-	await tasks.run();
+	await tasks2.run();
 
 	// Display project informations
 	console.log(bold(green('\nYour project is ready!\n')));
