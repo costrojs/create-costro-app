@@ -62,8 +62,13 @@ const commanderOptions = program.opts();
 		fs.mkdirSync(targetDir, { recursive: true });
 	}
 
-	const spinner = ora(`Fetching templates`);
-	spinner.start();
+	const spinner = ora();
+
+	if (commanderOptions.template) {
+		spinner.start(`Fetching template ${commanderOptions.template}`);
+	} else {
+		spinner.start(`Fetching templates`);
+	}
 
 	// Create cache directory
 	const cacheDir = '.cache';
@@ -79,7 +84,7 @@ const commanderOptions = program.opts();
 		'git+https://github.com/costrojs/costro-templates.git', // TODO: update to npm package instead of GitHub url
 		'--prefix',
 		`${targetDir}/${cacheDir}`,
-		'--no-audit' // https://github.com/facebook/create-react-app/issues/11174
+		'--no-audit'
 	]);
 	spinner.succeed();
 
@@ -109,8 +114,13 @@ const commanderOptions = program.opts();
 		template = options.template;
 	}
 
-	spinner.start('Create project');
 	const templatePath = `${templatesPath}/${template}`;
+	if (!fs.existsSync(templatePath)) {
+		spinner.fail(`Template ${template} is unknown.`);
+		process.exit(1);
+	}
+
+	spinner.start('Creating project');
 	fs.copy(templatePath, targetDir, function (err) {
 		if (err) {
 			console.log('An error occured while copying the folder.');
