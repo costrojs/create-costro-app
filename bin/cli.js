@@ -24,14 +24,14 @@ if (majorVersion < 12) {
 }
 
 const cwd = process.argv[2] || '.';
-// const packageVersion = fs.readJsonSync('../package.json').version;
+const packageVersion = fs.readJsonSync('../package.json').version;
 
 (async () => {
-	// console.log(
-	// 	`\n${green.bold(`Welcome to the Create Costro CLI`)} ${gray(
-	// 		`(v${packageVersion})`
-	// 	)}\n`
-	// );
+	console.log(
+		`\n${green.bold(`Welcome to the Create Costro CLI`)} ${gray(
+			`(v${packageVersion})`
+		)}\n`
+	);
 
 	// Check the target directory
 	if (fs.existsSync(cwd)) {
