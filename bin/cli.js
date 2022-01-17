@@ -36,18 +36,17 @@ const cwd = process.argv[2] || '.';
 	// Check the target directory
 	if (fs.existsSync(cwd)) {
 		if (fs.readdirSync(cwd).length > 0) {
-			const response = await inquirer.prompt([
-				{
-					type: 'confirm',
-					name: 'confirmDirectory',
-					message: 'Directory not empty. Continue?'
-				}
-			]);
-
-			// Exit if no answer (ctrl + c)
-			if (!response.confirmDirectory) {
-				process.exit(1);
-			}
+			// const response = await inquirer.prompt([
+			// 	{
+			// 		type: 'confirm',
+			// 		name: 'confirmDirectory',
+			// 		message: 'Directory not empty. Continue?'
+			// 	}
+			// ]);
+			// // Exit if no answer (ctrl + c)
+			// if (!response.confirmDirectory) {
+			// 	process.exit(1);
+			// }
 		}
 	} else {
 		fs.mkdirSync(cwd, { recursive: true });
@@ -79,19 +78,23 @@ const cwd = process.argv[2] || '.';
 	const templates = fs.readdirSync(templatesPath);
 
 	// Prompt template choice to the user
-	const options = await inquirer.prompt([
-		{
-			type: 'list',
-			name: 'template',
-			message: 'Which Costro app template?',
-			choices: templates
-		}
-	]);
+	// const options = await inquirer.prompt([
+	// 	{
+	// 		type: 'list',
+	// 		name: 'template',
+	// 		message: 'Which Costro app template?',
+	// 		choices: templates
+	// 	}
+	// ]);
 
 	// Exit if no answer (ctrl + c)
-	if (!options.template) {
-		process.exit(1);
-	}
+	// if (!options.template) {
+	// 	process.exit(1);
+	// }
+
+	const options = {
+		template: 'default'
+	};
 
 	spinner.start('Create project');
 	const templatePath = `${templatesPath}/${options.template}`;
