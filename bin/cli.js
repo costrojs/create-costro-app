@@ -2,13 +2,14 @@
 
 ('use strict');
 
-const path = require('path');
-const fs = require('fs-extra');
-const { bold, red, green, cyan, gray } = require('chalk');
-const prompts = require('prompts');
-const Listr = require('listr');
-const execa = require('execa');
+import path from 'path';
+import fs from 'fs-extra';
+import chalk from 'chalk';
+import { execa } from 'execa';
+import inquirer from 'inquirer';
+import ora from 'ora';
 
+const { bold, red, green, cyan, gray } = chalk;
 const currentNodeVersion = process.versions.node;
 const majorVersion = currentNodeVersion.split('.')[0];
 
@@ -22,10 +23,7 @@ if (majorVersion < 12) {
 	process.exit(1);
 }
 
-const {
-	name: packageName,
-	version: packageVersion
-} = require('../package.json');
+const packageVersion = fs.readJsonSync('../package.json').version;
 const cwd = process.argv[2] || '.';
 
 function isYarn() {
@@ -42,23 +40,25 @@ function isYarn() {
 	// Check the target directory
 	if (fs.existsSync(cwd)) {
 		if (fs.readdirSync(cwd).length > 0) {
-			const response = await prompts({
-				type: 'confirm',
-				name: 'confirmDirectory',
-				message: 'Directory not empty. Continue?',
-				initial: false
-			});
+			const response = await inquirer.prompt([
+				{
+					type: 'confirm',
+					name: 'confirmDirectory',
+					message: 'Directory not empty. Continue?'
+				}
+			]);
 
 			// Exit if no answer (ctrl + c)
 			if (!response.confirmDirectory) {
 				process.exit(1);
 			}
-
-			console.log();
 		}
 	} else {
 		fs.mkdirSync(cwd, { recursive: true });
 	}
+
+	const spinner = ora(`Fetching templates`);
+	spinner.start();
 
 	// Create cache directory
 	const CACHE_DIR = '.cache';
@@ -68,38 +68,24 @@ function isYarn() {
 		fs.remove(`${cwd}/${CACHE_DIR}`);
 	}
 
-	// Declare async tasks
-	const tasks1 = new Listr([
-		{
-			title: `Fetch templates`,
-			task: async () => {
-				await execa('npm', [
-					'install',
-					'git+https://github.com/costrojs/costro-templates.git',
-					'--prefix',
-					`${cwd}/${CACHE_DIR}`,
-					'--no-audit' // https://github.com/facebook/create-react-app/issues/11174
-				]);
-			}
-		}
+	// Fetching templates
+	await execa('npm', [
+		'install',
+		'git+https://github.com/costrojs/costro-templates.git',
+		'--prefix',
+		`${cwd}/${CACHE_DIR}`,
+		'--no-audit' // https://github.com/facebook/create-react-app/issues/11174
 	]);
-
-	// Run async tasks
-	await tasks1.run();
-
-	console.log();
+	spinner.succeed();
 
 	// Build the list of templates from GitHub repository
 	const templatesPath = `${cwd}/${CACHE_DIR}/node_modules/costro-templates/templates`;
-	const templates = fs.readdirSync(templatesPath).map((name) => ({
-		title: name[0].toUpperCase() + name.slice(1),
-		value: name
-	}));
+	const templates = fs.readdirSync(templatesPath);
 
 	// Prompt template choice to the user
-	const options = await prompts([
+	const options = await inquirer.prompt([
 		{
-			type: 'select',
+			type: 'list',
 			name: 'template',
 			message: 'Which Costro app template?',
 			choices: templates
@@ -111,59 +97,41 @@ function isYarn() {
 		process.exit(1);
 	}
 
-	console.log();
-
+	spinner.start('Create project');
 	const templatePath = `${templatesPath}/${options.template}`;
-	const tasks2 = new Listr([
-		{
-			title: 'Create project',
-			task: async () => {
-				return new Promise((resolve, reject) => {
-					fs.copy(templatePath, cwd, function (err) {
-						if (err) {
-							console.log(
-								'An error occured while copying the folder.'
-							);
-							return console.error(err);
-						}
-						// Update package.json (default version and template version)
-						const packageJson = fs.readJsonSync(
-							`${templatePath}/package.json`
-						);
-						packageJson['version'] = '1.0.0';
-						packageJson['costro-templates'] = packageJson.version;
-						fs.writeJsonSync(`${cwd}/package.json`, packageJson, {
-							spaces: '\t'
-						});
-						// Remove the cache
-						fs.remove(`${cwd}/${CACHE_DIR}`);
-						resolve();
-					});
-				});
-			}
-		},
-		{
-			title: 'Installing dependencies',
-			enabled: () => !isYarn(),
-			task: async () => {
-				const child = await execa(
-					'npm',
-					[
-						'install',
-						'--no-audit', // https://github.com/facebook/create-react-app/issues/11174
-						'--save',
-						'--save-exact'
-					],
-					{
-						cwd
-					}
-				);
-			}
+	fs.copy(templatePath, cwd, function (err) {
+		if (err) {
+			console.log('An error occured while copying the folder.');
+			return console.error(err);
 		}
-	]);
 
-	// Run async tasks
-	await tasks2.run();
+		// Update package.json (default version and template version)
+		const packageJson = fs.readJsonSync(`${templatePath}/package.json`);
+		packageJson['version'] = '1.0.0';
+		packageJson['costro-templates'] = packageJson.version;
+		fs.writeJsonSync(`${cwd}/package.json`, packageJson, {
+			spaces: '\t'
+		});
+
+		// Remove the cache
+		fs.remove(`${cwd}/${CACHE_DIR}`);
+	});
+	spinner.succeed();
+
+	spinner.start('Installing dependencies');
+	const child = await execa(
+		'npm',
+		[
+			'install',
+			'--no-audit', // https://github.com/facebook/create-react-app/issues/11174
+			'--save',
+			'--save-exact'
+		],
+		{
+			cwd
+		}
+	);
+	spinner.succeed();
 
 	// Display project informations
 	console.log(bold(green('\nYour project is ready!\n')));
