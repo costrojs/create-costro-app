@@ -23,15 +23,15 @@ if (majorVersion < 12) {
 	process.exit(1);
 }
 
-const packageVersion = fs.readJsonSync('../package.json').version;
 const cwd = process.argv[2] || '.';
+// const packageVersion = fs.readJsonSync('../package.json').version;
 
 (async () => {
-	console.log(
-		`\n${green.bold(`Welcome to the Create Costro CLI`)} ${gray(
-			`(v${packageVersion})`
-		)}\n`
-	);
+	// console.log(
+	// 	`\n${green.bold(`Welcome to the Create Costro CLI`)} ${gray(
+	// 		`(v${packageVersion})`
+	// 	)}\n`
+	// );
 
 	// Check the target directory
 	if (fs.existsSync(cwd)) {
@@ -67,7 +67,7 @@ const cwd = process.argv[2] || '.';
 	// Fetching templates
 	await execa('npm', [
 		'install',
-		'git+https://github.com/costrojs/costro-templates.git',
+		'git+https://github.com/costrojs/costro-templates.git', // TODO: update to npm package instead of GitHub url
 		'--prefix',
 		`${cwd}/${CACHE_DIR}`,
 		'--no-audit' // https://github.com/facebook/create-react-app/issues/11174
