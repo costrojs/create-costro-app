@@ -26,10 +26,6 @@ if (majorVersion < 12) {
 const packageVersion = fs.readJsonSync('../package.json').version;
 const cwd = process.argv[2] || '.';
 
-function isYarn() {
-	return (process.env.npm_config_user_agent || '').indexOf('yarn') === 0;
-}
-
 (async () => {
 	console.log(
 		`\n${green.bold(`Welcome to the Create Costro CLI`)} ${gray(
