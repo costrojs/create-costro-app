@@ -36,17 +36,17 @@ const cwd = process.argv[2] || '.';
 	// Check the target directory
 	if (fs.existsSync(cwd)) {
 		if (fs.readdirSync(cwd).length > 0) {
-			// const response = await inquirer.prompt([
-			// 	{
-			// 		type: 'confirm',
-			// 		name: 'confirmDirectory',
-			// 		message: 'Directory not empty. Continue?'
-			// 	}
-			// ]);
-			// // Exit if no answer (ctrl + c)
-			// if (!response.confirmDirectory) {
-			// 	process.exit(1);
-			// }
+			const response = await inquirer.prompt([
+				{
+					type: 'confirm',
+					name: 'confirmDirectory',
+					message: 'Directory not empty. Continue?'
+				}
+			]);
+			// Exit if no answer (ctrl + c)
+			if (!response.confirmDirectory) {
+				process.exit(1);
+			}
 		}
 	} else {
 		fs.mkdirSync(cwd, { recursive: true });
