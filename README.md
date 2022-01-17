@@ -7,6 +7,9 @@
 ```bash
 npm init costro-app
 npx create-costro-app
+npx create-costro-app sandbox
+npx create-costro-app --template [template-name]
+
 ```
 
 ## Licence

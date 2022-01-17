@@ -8,6 +8,7 @@ import chalk from 'chalk';
 import { execa } from 'execa';
 import inquirer from 'inquirer';
 import ora from 'ora';
+import { Command } from 'commander/esm.mjs';
 
 const { bold, red, green, cyan, gray } = chalk;
 const currentNodeVersion = process.versions.node;
@@ -23,19 +24,28 @@ if (majorVersion < 12) {
 	process.exit(1);
 }
 
-const cwd = process.argv[2] || '.';
-const packageVersion = fs.readJsonSync('../package.json').version;
+const cwd = fs.realpathSync(process.cwd());
+const targetDir = `${fs.realpathSync(process.cwd())}/${process.argv[2] || ''}`;
+const packageJson = fs.readJsonSync(`${cwd}/package.json`);
+const program = new Command();
+program
+	.name(packageJson.name)
+	.version(
+		packageJson.version,
+		'-v, --version',
+		'show the Create Costro App version'
+	)
+	.option('--template <name>', 'specify the template name');
+
+program.parse(process.argv);
+const commanderOptions = program.opts();
 
 (async () => {
-	console.log(
-		`\n${green.bold(`Welcome to the Create Costro CLI`)} ${gray(
-			`(v${packageVersion})`
-		)}\n`
-	);
+	console.log(green.bold('Welcome to the Create Costro App CLI\n'));
 
 	// Check the target directory
-	if (fs.existsSync(cwd)) {
-		if (fs.readdirSync(cwd).length > 0) {
+	if (fs.existsSync(targetDir)) {
+		if (fs.readdirSync(targetDir).length > 0) {
 			const response = await inquirer.prompt([
 				{
 					type: 'confirm',
@@ -49,18 +59,18 @@ const packageVersion = fs.readJsonSync('../package.json').version;
 			}
 		}
 	} else {
-		fs.mkdirSync(cwd, { recursive: true });
+		fs.mkdirSync(targetDir, { recursive: true });
 	}
 
 	const spinner = ora(`Fetching templates`);
 	spinner.start();
 
 	// Create cache directory
-	const CACHE_DIR = '.cache';
-	if (!fs.existsSync(`${cwd}/${CACHE_DIR}`)) {
-		fs.mkdirSync(`${cwd}/${CACHE_DIR}`);
+	const cacheDir = '.cache';
+	if (!fs.existsSync(`${targetDir}/${cacheDir}`)) {
+		fs.mkdirSync(`${targetDir}/${cacheDir}`);
 	} else {
-		fs.remove(`${cwd}/${CACHE_DIR}`);
+		fs.remove(`${targetDir}/${cacheDir}`);
 	}
 
 	// Fetching templates
@@ -68,37 +78,40 @@ const packageVersion = fs.readJsonSync('../package.json').version;
 		'install',
 		'git+https://github.com/costrojs/costro-templates.git', // TODO: update to npm package instead of GitHub url
 		'--prefix',
-		`${cwd}/${CACHE_DIR}`,
+		`${targetDir}/${cacheDir}`,
 		'--no-audit' // https://github.com/facebook/create-react-app/issues/11174
 	]);
 	spinner.succeed();
 
 	// Build the list of templates from GitHub repository
-	const templatesPath = `${cwd}/${CACHE_DIR}/node_modules/costro-templates/templates`;
+	const templatesPath = `${targetDir}/${cacheDir}/node_modules/costro-templates/templates`;
 	const templates = fs.readdirSync(templatesPath);
 
-	// Prompt template choice to the user
-	// const options = await inquirer.prompt([
-	// 	{
-	// 		type: 'list',
-	// 		name: 'template',
-	// 		message: 'Which Costro app template?',
-	// 		choices: templates
-	// 	}
-	// ]);
+	// Check if template flag was set or prompt the choice to the user
+	let template;
+	if (commanderOptions.template) {
+		template = commanderOptions.template;
+	} else {
+		const options = await inquirer.prompt([
+			{
+				type: 'list',
+				name: 'template',
+				message: 'Which Costro app template?',
+				choices: templates
+			}
+		]);
 
-	// Exit if no answer (ctrl + c)
-	// if (!options.template) {
-	// 	process.exit(1);
-	// }
+		// Exit if no answer (ctrl + c)
+		if (!options.template) {
+			process.exit(1);
+		}
 
-	const options = {
-		template: 'default'
-	};
+		template = options.template;
+	}
 
 	spinner.start('Create project');
-	const templatePath = `${templatesPath}/${options.template}`;
-	fs.copy(templatePath, cwd, function (err) {
+	const templatePath = `${templatesPath}/${template}`;
+	fs.copy(templatePath, targetDir, function (err) {
 		if (err) {
 			console.log('An error occured while copying the folder.');
 			return console.error(err);
@@ -108,12 +121,16 @@ const packageVersion = fs.readJsonSync('../package.json').version;
 		const packageJson = fs.readJsonSync(`${templatePath}/package.json`);
 		packageJson['version'] = '1.0.0';
 		packageJson['costro-templates'] = packageJson.version;
-		fs.writeJsonSync(`${cwd}/package.json`, packageJson, {
+		fs.writeJsonSync(`${targetDir}/package.json`, packageJson, {
 			spaces: '\t'
 		});
 
+		// Rename gitignore to prevent npm from renaming it to .npmignore
+		// See: https://github.com/npm/npm/issues/1862
+		fs.moveSync(`${targetDir}/gitignore`, `${targetDir}/.gitignore`);
+
 		// Remove the cache
-		fs.remove(`${cwd}/${CACHE_DIR}`);
+		fs.remove(`${targetDir}/${cacheDir}`);
 	});
 	spinner.succeed();
 
@@ -127,7 +144,7 @@ const packageVersion = fs.readJsonSync('../package.json').version;
 			'--save-exact'
 		],
 		{
-			cwd
+			cwd: targetDir
 		}
 	);
 	spinner.succeed();
