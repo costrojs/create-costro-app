@@ -5,42 +5,28 @@
 		}
     ],
     "settings": {
-        "[javascript]": {
-            "editor.formatOnSave": true
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "[javascript][typescript][postcss][html][markdown][json]": {
+            "editor.formatOnSave": true,
+            "editor.tabSize": 4,
+            "editor.rulers": [100]
         },
-        "[markdown]": {
-            "editor.formatOnSave": true
+        "files.associations": {
+            "*.css": "postcss",
+            "*.html": "html",
+            "*.ts": "typescript",
+            "*.json": "json"
         },
-        "editor.codeActionsOnSave": {
-            "source.fixAll.eslint": true,
-            "source.fixAll.stylelint": true
-        },
-        "editor.formatOnSave": false,
-        "editor.tabSize": 4,
         "files.trimTrailingWhitespace": true,
-        "javascript.format.enable": false,
-        "javascript.validate.enable": false,
-        "typescript.validate.enable": false,
         "search.exclude": {
             "**/node_modules": true
         },
-        "editor.rulers": [100]
     },
     "extensions": {
         "recommendations": [
             "davidanson.vscode-markdownlint",
             "esbenp.prettier-vscode",
             "dbaeumer.vscode-eslint"
-        ]
-    },
-    "launch": {
-        "configurations": [
-            {
-                "type": "node",
-                "request": "attach",
-                "name": "Node: Nodemon",
-                "restart": true
-            }
         ]
     }
 }
