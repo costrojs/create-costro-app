@@ -30,11 +30,7 @@ const packageJson = fs.readJsonSync(`${cwd}/package.json`);
 const program = new Command();
 program
 	.name(packageJson.name)
-	.version(
-		packageJson.version,
-		'-v, --version',
-		'show the Create Costro App version'
-	)
+	.version(packageJson.version, '-v, --version', 'show the Create Costro App version')
 	.option('--template <name>', 'specify the template name');
 
 program.parse(process.argv);
