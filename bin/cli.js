@@ -130,7 +130,7 @@ const commanderOptions = program.opts();
 		packageJson['version'] = '1.0.0';
 		packageJson['costro-templates'] = packageJson.version;
 		fs.writeJsonSync(`${targetDir}/package.json`, packageJson, {
-			spaces: '\t'
+			spaces: '\t' // tabs
 		});
 
 		// Rename gitignore to prevent npm from renaming it to .npmignore
@@ -146,31 +146,21 @@ const commanderOptions = program.opts();
 	spinner.succeed();
 
 	spinner.start('Installing dependencies');
-	const child = await execa(
-		'npm',
-		[
-			'install',
-			'--no-audit', // https://github.com/facebook/create-react-app/issues/11174
-			'--save',
-			'--save-exact'
-		],
-		{
-			cwd: targetDir
-		}
-	);
+	await execa('npm', ['install', '--no-audit', '--save', '--save-exact'], {
+		cwd: targetDir
+	});
 	spinner.succeed();
 
 	// Display project informations
 	console.log(bold(green('\nYour project is ready!\n')));
 	console.log('Available npm scripts:');
 	console.log(`- ${bold.cyan('npm run dev')}`);
-	console.log(`- ${bold.cyan('npm run build')}`);
-	console.log(`- ${bold.cyan('npm run lint')}`);
 	console.log(`- ${bold.cyan('npm run jest')}`);
-	console.log(`\nTo close the dev server, hit ${bold(cyan('Ctrl-C'))}`);
+	console.log(`- ${bold.cyan('npm run lint')}`);
+	console.log(`- ${bold.cyan('npm run build')}`);
 	console.log(
-		`Problems? Open an issue on ${cyan(
+		`Problems? Open an issue at ${cyan(
 			'https://github.com/costrojs/create-costro/issues'
-		)} if none exists already.`
+		)} if one doesn't already exist.`
 	);
 })();
