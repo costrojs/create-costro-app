@@ -88,19 +88,19 @@ const commanderOptions = program.opts();
 
 	// Build the list of templates from GitHub repository
 	const templatesPath = `${targetDir}/${cacheDir}/node_modules/costro-templates/templates`;
-	const templates = fs.readdirSync(templatesPath);
+	const templatesList = fs.readdirSync(templatesPath);
 
 	// Check if template flag was set or prompt the choice to the user
-	let template;
+	let selectedTemplate;
 	if (commanderOptions.template) {
-		template = commanderOptions.template;
-	} else {
+		selectedTemplate = commanderOptions.template;
+	} else if (templatesList) {
 		const options = await inquirer.prompt([
 			{
 				type: 'list',
 				name: 'template',
 				message: 'Which Costro app template?',
-				choices: templates
+				choices: templatesList
 			}
 		]);
 
@@ -109,12 +109,12 @@ const commanderOptions = program.opts();
 			process.exit(1);
 		}
 
-		template = options.template;
+		selectedTemplate = options.template;
 	}
 
-	const templatePath = `${templatesPath}/${template}`;
+	const templatePath = `${templatesPath}/${selectedTemplate}`;
 	if (!fs.existsSync(templatePath)) {
-		spinner.fail(`Template ${template} is unknown.`);
+		spinner.fail(`Template ${selectedTemplate} is unknown.`);
 		process.exit(1);
 	}
 
@@ -135,7 +135,10 @@ const commanderOptions = program.opts();
 
 		// Rename gitignore to prevent npm from renaming it to .npmignore
 		// See: https://github.com/npm/npm/issues/1862
-		fs.moveSync(`${targetDir}/gitignore`, `${targetDir}/.gitignore`);
+		const gitIgnorePath = `${targetDir}/gitignore`;
+		if (fs.existsSync(gitIgnorePath)) {
+			fs.moveSync(gitIgnorePath, `${targetDir}/.gitignore`);
+		}
 
 		// Remove the cache
 		fs.remove(`${targetDir}/${cacheDir}`);
