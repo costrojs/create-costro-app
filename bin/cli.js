@@ -29,9 +29,11 @@ const targetDir = `${fs.realpathSync(process.cwd())}/${process.argv[2] || ''}`;
 const packageJson = fs.readJsonSync(`${cwd}/package.json`);
 const program = new Command();
 program
-	.name(packageJson.name)
-	.version(packageJson.version, '-v, --version', 'show the Create Costro App version')
-	.option('--template <name>', 'specify the template name');
+	.name(`${packageJson.name} <directory>`) // Show the directory here to display it before the options in help
+	// .argument('<directory>')
+	.showHelpAfterError('(add --help for additional information)')
+	.option('--template <name>', 'specify the template name')
+	.version(packageJson.version, '-v, --version', 'show the Create Costro App version');
 
 program.parse(process.argv);
 const commanderOptions = program.opts();
