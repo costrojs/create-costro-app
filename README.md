@@ -1,19 +1,16 @@
 # Create Costro App
 
-## Getting started
+![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/costrojs/create-costro-app/ci/main?style=for-the-badge)
 
 ⚠️ The project is under development.
 
-```bash
-npm init costro-app
-npx create-costro-app
-npx create-costro-app [directory] --template [template-name]
-npx create-costro-app --template [template-name]
-npx create-costro-app -v
-npx create-costro-app -h
-npx create-costro-app --help
-npx create-costro-app --version
-```
+## Documentation
+
+You can find the Create Costro App documentation and examples on the [GitHub Pages](https://costro.js.org/cli).
+
+## Questions
+
+For questions and support please use the [GitHub Discussions](https://github.com/costrojs/create-costro-app/discussions). For bug report or feature request, please use the [issues on GitHub](https://github.com/costrojs/create-costro-app/issues).<br />Pull Requests are welcome!
 
 ## Licence
 
