@@ -35,9 +35,9 @@ body:
     id: system-info
     attributes:
       label: System Info
-      description: Output of `npx envinfo --system --npmPackages costro,rollup,webpack --binaries --browsers`
+      description: Output of `npx envinfo --system --npmPackages costro,create-costro-app,rollup,webpack --binaries --browsers --npmGlobalPackages create-costro-app`
       render: shell
-      placeholder: System, binaries, browsers
+      placeholder: System, binaries, browsers, npm packages
     validations:
       required: true
   - type: dropdown
