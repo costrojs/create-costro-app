@@ -1,6 +1,14 @@
 {
 	"name": "create-costro-app",
-	"version": "1.0.0",
+	"version": "1.0.1",
+	"description": "Create Costro App in seconds by running one command",
+	"keywords": [
+		"costro",
+		"create-costro-app",
+		"costro-templates",
+		"zero-configuration",
+		"build-tools"
+	],
 	"homepage": "https://costro.js.org",
 	"bugs": {
 		"url": "https://github.com/costrojs/create-costro-app/issues"
