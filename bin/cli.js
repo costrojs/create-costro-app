@@ -149,7 +149,7 @@ class CreateCostroApp {
 
 		await execa('npm', [
 			'install',
-			'git+https://github.com/costrojs/costro-templates.git', // TODO: update to npm package instead of GitHub url
+			'costro-templates',
 			'--prefix',
 			`${this.targetDir}/${CACHE_DIR}`,
 			'--no-audit'
