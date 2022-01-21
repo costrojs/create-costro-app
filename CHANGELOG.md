@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 1.0.1
+
+### Updates
+
+- npm infos
+
 ## 1.0.0
 
 ### New features
