@@ -6,7 +6,7 @@
 
 ## Documentation
 
-You can find the Create Costro App documentation and examples on the [GitHub Pages](https://costro.js.org/cli).
+You can find the Create Costro App documentation and examples on the [Costrojs website](https://costro.js.org/cli).
 
 ## Questions
 
