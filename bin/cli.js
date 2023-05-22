@@ -20,10 +20,10 @@ function checkNodeVersion() {
 	const majorVersion = currentNodeVersion.split('.')[0];
 
 	// Check the minimum version of Node.js
-	if (majorVersion < 12) {
+	if (majorVersion < 16) {
 		console.error(
 			red(
-				`You are running Node ${currentNodeVersion}.\nCreate Costro App requires Node 12 or higher.\nPlease update your version of Node.`
+				`You are running Node ${currentNodeVersion}.\nCreate Costro App requires Node 16 or higher.\nPlease update your version of Node.`
 			)
 		);
 		process.exit(1);
@@ -263,7 +263,7 @@ class CreateCostroApp {
 		console.log(`- ${bold.cyan('npm run build')}`);
 		console.log(
 			`\nProblems? Open an issue at ${cyan(
-				'https://github.com/costrojs/create-costro/issues'
+				'https://github.com/costrojs/create-costro-app/issues'
 			)} if one doesn't already exist.`
 		);
 	}

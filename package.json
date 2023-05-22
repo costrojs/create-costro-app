@@ -1,6 +1,6 @@
 {
 	"name": "create-costro-app",
-	"version": "1.0.1",
+	"version": "2.0.0",
 	"description": "Create Costro App in seconds by running one command",
 	"keywords": [
 		"costro",
@@ -29,16 +29,15 @@
 	"scripts": {
 		"inspect": "node --inspect bin/cli.js"
 	},
-	"dependencies": {},
 	"devDependencies": {
-		"chalk": "^5.0.0",
-		"commander": "^8.3.0",
-		"execa": "^6.0.0",
-		"fs-extra": "^10.0.0",
-		"inquirer": "^8.2.0",
-		"ora": "^6.0.1"
+		"chalk": "^5.2.0",
+		"commander": "^10.0.1",
+		"execa": "^7.1.1",
+		"fs-extra": "^11.1.1",
+		"inquirer": "^9.2.6",
+		"ora": "^6.3.1"
 	},
 	"engines": {
-		"node": ">= 12.22.0"
+		"node": ">=16.20.0"
 	}
 }
