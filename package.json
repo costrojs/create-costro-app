@@ -27,9 +27,9 @@
 		"bin"
 	],
 	"scripts": {
+		"build": "echo \"No build specified\" && exit 0",
 		"inspect": "node --inspect bin/cli.js",
-		"test": "echo \"No test specified\" && exit 0",
-		"build": "echo \"No build specified\" && exit 0"
+		"test": "echo \"No test specified\" && exit 0"
 	},
 	"devDependencies": {
 		"chalk": "^5.2.0",
