@@ -1,6 +1,6 @@
 # Create Costro App
 
-![GitHub Workflow Status (branch)](https://img.shields.io/github/actions/workflow/status/costrojs/create-costro-app/ci.yml?branch=main&style=for-the-badge)
+![GitHub Workflow Status (branch)](https://img.shields.io/github/actions/workflow/status/costrojs/create-costro-app/build.yml?branch=main&style=for-the-badge)
 
 The easiest way to get started with Costro is to use [`create-costro-app`](https://github.com/costrojs/create-costro-app). This CLI tool lets you quickly start creating a new Costro application, with everything set up for you. You can create a new app using the default Costro template or using one of the [official Costro templates](https://costro.js.org/cli#templates).
 
