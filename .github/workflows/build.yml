@@ -10,23 +10,10 @@ on:
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 60
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        node: [16, 18, 20]
-    steps:
-      - uses: actions/checkout@v3
-
-      - uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node }}
-          cache: 'npm'
-          cache-dependency-path: '**/package-lock.json'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run CLI
-        run: node bin/cli.js sandbox --template default
+        node-version: [16, 18, 20]
+    uses: yoriiis/actions/.github/workflows/test-and-build.yml@main
+    with:
+      node-version: ${{ matrix.node-version }}
+      command-build: node bin/cli.js sandbox --template default
