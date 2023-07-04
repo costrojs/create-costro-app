@@ -13,7 +13,8 @@ jobs:
     strategy:
       matrix:
         node-version: [16, 18, 20]
+        template: [default, typescript]
     uses: yoriiis/actions/.github/workflows/test-and-build.yml@main
     with:
       node-version: ${{ matrix.node-version }}
-      command-build: node bin/cli.js sandbox --template default
+      command-build: node bin/cli.js sandbox --template ${{ matrix.template }}
