@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 
-import { fileURLToPath } from 'url';
-import path from 'path';
-import fs from 'fs-extra';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import chalk from 'chalk';
+import { Command } from 'commander/esm.mjs';
 import { execa } from 'execa';
+import fs from 'fs-extra';
 import inquirer from 'inquirer';
 import ora from 'ora';
-import { Command } from 'commander/esm.mjs';
 
 const { bold, red, green, cyan } = chalk;
 const CACHE_DIR = '.cache';
@@ -20,10 +20,10 @@ function checkNodeVersion() {
 	const majorVersion = currentNodeVersion.split('.')[0];
 
 	// Check the minimum version of Node.js
-	if (majorVersion < 16) {
+	if (majorVersion < 20) {
 		console.error(
 			red(
-				`You are running Node ${currentNodeVersion}.\nCreate Costro App requires Node 16 or higher.\nPlease update your version of Node.`
+				`You are running Node ${currentNodeVersion}.\nCreate Costro App requires Node 20 or higher.\nPlease update your version of Node.`
 			)
 		);
 		process.exit(1);
@@ -214,7 +214,7 @@ class CreateCostroApp {
 
 				// Update the package.json in the project
 				const packageJson = fs.readJsonSync(`${this.templates.pathSelected}/package.json`);
-				packageJson['version'] = '1.0.0';
+				packageJson.version = '1.0.0';
 				packageJson['costro-templates'] = packageJson.version;
 				fs.writeJsonSync(`${this.targetDir}/package.json`, packageJson, {
 					spaces: '\t' // tabs

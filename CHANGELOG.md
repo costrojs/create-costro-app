@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 3.0.0
+
+### ⚠️ Breaking changes
+
+- Minimum supported `Node.js` version is `20.18.0` ([#5](https://github.com/costrojs/create-costro-app/pull/5))
+
 ## 2.0.0
 
 ### ⚠️ Breaking changes
